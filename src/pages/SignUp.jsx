@@ -1,11 +1,13 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import supabase from "../lib/supabase";
 
 export default function SignUp() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -34,6 +36,35 @@ export default function SignUp() {
     const trimmedReferralCode = formData.referralCode.trim();
 
     try {
+      let parentId = null;
+
+      if (trimmedReferralCode) {
+        const { data: parentProfile, error: parentError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("referral_code", trimmedReferralCode)
+          .maybeSingle();
+
+        if (parentError) throw parentError;
+
+        if (!parentProfile) {
+          throw new Error("Invalid referral code. Please check and try again.");
+        }
+
+        parentId = parentProfile.id;
+
+        const { count, error: countError } = await supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .eq("parent_id", parentId);
+
+        if (countError) throw countError;
+
+        if (count >= 2) {
+          throw new Error("Referral limit reached.");
+        }
+      }
+
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: trimmedEmail,
         password: formData.password,
@@ -46,18 +77,6 @@ export default function SignUp() {
       const user = signUpData?.user;
       if (!user?.id) {
         throw new Error("Unable to create user. Please try again.");
-      }
-
-      let parentId = null;
-
-      if (trimmedReferralCode) {
-        const { data: parentProfile } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("referral_code", trimmedReferralCode)
-          .maybeSingle();
-
-        parentId = parentProfile?.id ?? null;
       }
 
       const { error: profileError } = await supabase.from("profiles").insert({
@@ -73,7 +92,9 @@ export default function SignUp() {
         throw profileError;
       }
 
-      setSuccess("Signup successful. Your account has been created.");
+      toast.success("Signup successful!");
+      navigate("/");
+      
       setFormData({
         name: "",
         email: "",
@@ -145,13 +166,13 @@ export default function SignUp() {
           />
 
           {error ? (
-            <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+            <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400">
               {error}
             </p>
           ) : null}
 
           {success ? (
-            <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-400">
               {success}
             </p>
           ) : null}
@@ -160,11 +181,11 @@ export default function SignUp() {
             {loading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
-        <p className="mt-4 text-sm text-slate-600">
+        <p className="mt-4 text-sm text-slate-600 dark:text-neutral-400">
           Already have an account?{" "}
           <Link
             to="/login"
-            className="font-semibold text-blue-700 hover:text-blue-800"
+            className="font-semibold text-blue-700 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-400"
           >
             Login
           </Link>

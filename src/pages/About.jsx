@@ -4,11 +4,11 @@ export default function About() {
   return (
     <div className="space-y-8">
       <section className="max-w-3xl">
-        <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+        <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
           About LocalBazaar
         </h1>
 
-        <p className="mt-4 text-lg leading-8 text-slate-600">
+        <p className="mt-4 text-lg leading-8 text-slate-600 dark:text-neutral-400">
           LocalBazaar is a community-driven marketplace that connects local
           sellers and buyers through trusted networks. Our platform helps users
           discover nearby businesses, build meaningful connections, and grow

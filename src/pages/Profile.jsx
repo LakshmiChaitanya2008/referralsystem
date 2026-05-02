@@ -56,40 +56,50 @@ function ReferralTreeNode({ node }) {
     return null;
   }
 
-  const [leftChild, rightChild] = node.children || [];
-  const hasTwoChildren = Boolean(leftChild && rightChild);
+  const children = node.children || [];
+  const hasTwoChildren = children.length === 2;
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="w-full max-w-xs rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-md transition-transform duration-200 hover:scale-[1.03] hover:shadow-lg">
+    <div className="flex flex-col items-center">
+      <div className="w-full max-w-xs rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-5 py-4 shadow-md transition-transform duration-200 hover:scale-[1.03] hover:shadow-lg dark:shadow-none">
         <div className="flex items-center justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900">{node.name || node.email || "User"}</p>
-            <p className="max-w-[170px] truncate overflow-hidden whitespace-nowrap text-xs text-slate-500">
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">{node.name || node.email || "User"}</p>
+            <p className="max-w-[170px] truncate overflow-hidden whitespace-nowrap text-xs text-slate-500 dark:text-neutral-400">
               {formatEmailDisplay(node.email)}
             </p>
           </div>
-          <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+          <span className="rounded-full bg-blue-50 dark:bg-blue-900/50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
             User
           </span>
         </div>
       </div>
 
-      {leftChild || rightChild ? (
-        <div className="mt-4 flex w-full flex-col items-center gap-3">
-          <div className="h-6 w-px bg-slate-300" />
+      {children.length > 0 ? (
+        <div className="flex w-full flex-col items-center">
+          <div className={`w-px bg-slate-300 dark:bg-neutral-700 ${hasTwoChildren ? "h-6" : "h-10"}`} />
 
-          <div className="relative flex w-full max-w-3xl items-start justify-center gap-12">
-            {hasTwoChildren ? (
-              <div className="absolute left-1/4 right-1/4 top-0 h-px bg-slate-300" />
-            ) : null}
+          <div className="relative flex w-full min-w-max items-start justify-center">
+            {children.map((child, index) => {
+              const isLeftChild = index === 0;
+              const isRightChild = index === 1;
 
-            {[leftChild, rightChild].map((child, index) => (
-              <div key={index} className="flex min-h-4 flex-1 flex-col items-center">
-                {child ? <div className="h-4 w-px bg-slate-300" /> : null}
-                {child ? <ReferralTreeNode node={child} /> : null}
-              </div>
-            ))}
+              return (
+                <div key={index} className="relative flex min-h-4 flex-1 flex-col items-center px-2 sm:px-4">
+                  {hasTwoChildren && isLeftChild ? (
+                    <div className="absolute top-0 right-0 left-1/2 h-px bg-slate-300 dark:bg-neutral-700" />
+                  ) : null}
+                  {hasTwoChildren && isRightChild ? (
+                    <div className="absolute top-0 left-0 right-1/2 h-px bg-slate-300 dark:bg-neutral-700" />
+                  ) : null}
+
+                  {hasTwoChildren ? (
+                    <div className="h-4 w-px bg-slate-300 dark:bg-neutral-700" />
+                  ) : null}
+                  <ReferralTreeNode node={child} />
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : null}
@@ -241,19 +251,19 @@ export default function Profile() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <h1 className="text-4xl font-bold tracking-tight text-slate-900">Profile</h1>
+      <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Profile</h1>
 
       <Card title="User Info" description="Your account details and profile basics.">
-        <div className="rounded-xl bg-slate-50 p-6 shadow-md">
+        <div className="rounded-xl bg-slate-50 dark:bg-neutral-900 p-6 shadow-md dark:shadow-none dark:border dark:border-neutral-800">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 text-xl font-semibold text-white shadow-md">
                 {initials || "U"}
               </div>
               <div className="space-y-1">
-                <p className="text-lg font-semibold text-slate-900">{profileData.name || "User"}</p>
-                <p className="text-sm text-slate-500">{profileData.email || "-"}</p>
-                <p className="text-sm text-slate-500">{profileData.phone || "-"}</p>
+                <p className="text-lg font-semibold text-slate-900 dark:text-white">{profileData.name || "User"}</p>
+                <p className="text-sm text-slate-500 dark:text-neutral-400">{profileData.email || "-"}</p>
+                <p className="text-sm text-slate-500 dark:text-neutral-400">{profileData.phone || "-"}</p>
               </div>
             </div>
             <Button variant="secondary">Edit Profile</Button>
@@ -263,12 +273,12 @@ export default function Profile() {
 
       <Card title="Referral Code" description="Share this code to grow your referral network.">
         {profileData.referral_code ? (
-          <div className="flex flex-col gap-6 rounded-xl bg-slate-50 p-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-6 rounded-xl bg-slate-50 dark:bg-neutral-900 p-6 md:flex-row md:items-center md:justify-between dark:border dark:border-neutral-800">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-neutral-400">
                 Your code
               </p>
-              <p className="mt-1 rounded-xl border border-blue-100 bg-white px-3 py-2 text-2xl font-bold tracking-wider text-blue-700 shadow-md">
+              <p className="mt-1 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-white dark:bg-neutral-950 px-3 py-2 text-2xl font-bold tracking-wider text-blue-700 dark:text-blue-400 shadow-md dark:shadow-none">
                 {profileData.referral_code}
               </p>
             </div>
@@ -276,12 +286,12 @@ export default function Profile() {
               <Button variant="secondary" onClick={handleCopyCode}>
                 Copy
               </Button>
-              {copyFeedback ? <span className="text-sm text-emerald-600">{copyFeedback}</span> : null}
+              {copyFeedback ? <span className="text-sm text-emerald-600 dark:text-emerald-400">{copyFeedback}</span> : null}
             </div>
           </div>
         ) : (
-          <div className="space-y-4 rounded-xl bg-slate-50 p-6">
-            <p className="text-sm text-slate-600">
+          <div className="space-y-4 rounded-xl bg-slate-50 dark:bg-neutral-900 p-6 dark:border dark:border-neutral-800">
+            <p className="text-sm text-slate-600 dark:text-neutral-400">
               Create your referral code to start inviting people.
             </p>
             <div className="flex flex-col gap-3 md:flex-row">
@@ -289,14 +299,14 @@ export default function Profile() {
                 value={newReferralCode}
                 onChange={(event) => setNewReferralCode(event.target.value)}
                 placeholder="Enter referral code"
-                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)]"
+                className="w-full rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3.5 py-2.5 text-sm text-slate-900 dark:text-white outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-neutral-500 focus:border-blue-500 dark:focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] dark:focus:shadow-[0_0_0_3px_rgba(59,130,246,0.3)]"
               />
               <Button onClick={handleCreateCode} disabled={referralLoading || !userId}>
                 {referralLoading ? "Creating..." : "Create Code"}
               </Button>
             </div>
             {referralError ? (
-              <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+              <p className="rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/50 px-3 py-2 text-sm text-rose-700 dark:text-rose-400">
                 {referralError}
               </p>
             ) : null}
@@ -305,27 +315,27 @@ export default function Profile() {
       </Card>
 
       <Card title="Network Tree" description="Snapshot of your direct and indirect referrals.">
-        <p className="mb-4 text-sm text-slate-500">Total profiles fetched: {allProfiles.length}</p>
+        <p className="mb-4 text-sm text-slate-500 dark:text-neutral-400">Total profiles fetched: {allProfiles.length}</p>
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-md">
-            <p className="text-sm text-slate-500">Direct Referrals</p>
-            <p className="mt-1 text-3xl font-bold text-slate-900">{directReferrals}</p>
+          <div className="rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-md dark:shadow-none">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">Direct Referrals</p>
+            <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">{directReferrals}</p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-md">
-            <p className="text-sm text-slate-500">Second Level</p>
-            <p className="mt-1 text-3xl font-bold text-slate-900">{secondLevelReferrals}</p>
+          <div className="rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-md dark:shadow-none">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">Second Level</p>
+            <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">{secondLevelReferrals}</p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-md">
-            <p className="text-sm text-slate-500">Total Network</p>
-            <p className="mt-1 text-3xl font-bold text-slate-900">{totalNetwork}</p>
+          <div className="rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-md dark:shadow-none">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">Total Network</p>
+            <p className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">{totalNetwork}</p>
           </div>
         </div>
 
-        <div className="mx-auto mt-6 max-w-4xl rounded-xl bg-slate-50 p-6">
+        <div className="mx-auto mt-6 max-w-4xl rounded-xl bg-slate-50 dark:bg-neutral-900 dark:border dark:border-neutral-800 p-6 overflow-auto">
           {referralTree ? (
             <ReferralTreeNode node={referralTree} />
           ) : (
-            <p className="text-sm text-slate-600">No referral tree data available yet.</p>
+            <p className="text-sm text-slate-600 dark:text-neutral-400">No referral tree data available yet.</p>
           )}
         </div>
       </Card>

@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --color-brand-primary: #3b82f6;
   --color-brand-secondary: #4648d4;
@@ -10,6 +12,11 @@
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   color: #0b1c30;
   background-color: #f8f9ff;
+}
+
+.dark {
+  color: #f8f9ff;
+  background-color: #0a0a0a; /* Neutral 950 */
 }
 
 body {

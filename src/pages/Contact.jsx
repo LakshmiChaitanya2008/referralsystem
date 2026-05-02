@@ -6,8 +6,8 @@ export default function Contact() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <section>
-        <h1 className="text-4xl font-bold tracking-tight text-slate-900">Contact Us</h1>
-        <p className="mt-3 text-slate-600">
+        <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Contact Us</h1>
+        <p className="mt-3 text-slate-600 dark:text-neutral-400">
           Tell us about your referral goals. We usually reply within one business day.
         </p>
       </section>

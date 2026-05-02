@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Button from "./ui/Button";
 import supabase from "../lib/supabase";
+import { useTheme } from "../context/ThemeContext";
 
 const navItems = [
   { name: "Home", to: "/" },
@@ -15,6 +16,7 @@ export default function Navbar() {
   const [userName, setUserName] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     let isMounted = true;
@@ -24,9 +26,7 @@ export default function Navbar() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!isMounted) {
-        return;
-      }
+      if (!isMounted) return;
 
       if (!user) {
         setIsLoggedIn(false);
@@ -47,6 +47,7 @@ export default function Navbar() {
         user.user_metadata?.name ||
         user.email?.split("@")[0] ||
         "User";
+
       setUserName(resolvedName);
     }
 
@@ -76,27 +77,35 @@ export default function Navbar() {
     navigate("/login");
   }
 
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
   return (
-    <>
-      <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header className="sticky top-0 z-50 border-b border-slate-200/60 dark:border-neutral-800/60 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md py-4">
+      <nav className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6">
+        {/* Logo */}
+        <div className="flex flex-1 justify-start">
           <Link
             to="/"
-            className="text-lg font-bold tracking-tight text-slate-900"
+            className="text-lg font-bold tracking-tight text-slate-900 dark:text-white transition hover:opacity-80"
           >
             LocalBazaar
           </Link>
+        </div>
 
-          <div className="hidden items-center gap-1 md:flex">
+        {/* Nav Links */}
+        <div className="hidden flex-1 justify-center md:flex">
+          <div className="flex items-center gap-1.5 rounded-full bg-slate-50 dark:bg-neutral-900 p-1.5 border border-slate-100/60 dark:border-neutral-800/60 shadow-sm">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  `rounded-full px-4 py-1.5 text-[15px] font-medium transition-all ${
                     isActive
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      ? "bg-white dark:bg-neutral-800 text-slate-900 dark:text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-neutral-700/50"
+                      : "text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-neutral-800/50"
                   }`
                 }
               >
@@ -104,43 +113,83 @@ export default function Navbar() {
               </NavLink>
             ))}
           </div>
+        </div>
 
-          <div className="flex items-center gap-3">
-            {isLoggedIn ? (
-              <div className="flex items-center gap-2">
-                <Link to="/profile" className="group">
-                  <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1.5 shadow-sm transition-shadow group-hover:shadow-md">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 text-xs font-semibold text-white">
-                      {initials || "U"}
-                    </div>
-                    <span className="pr-2 text-sm font-semibold text-slate-800">{userName}</span>
-                  </div>
-                </Link>
-                <Button
-                  variant="secondary"
-                  className="px-3 py-2"
-                  onClick={handleLogout}
-                  disabled={isLoggingOut}
-                >
-                  {isLoggingOut ? "Logging out..." : "Logout"}
-                </Button>
-              </div>
+        {/* Right Section */}
+        <div className="flex flex-1 items-center justify-end gap-5">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="rounded-full p-2 text-slate-500 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-800 transition"
+            title="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+              </svg>
             ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="hidden text-sm font-medium text-slate-700 md:block"
-                >
-                  Login
-                </Link>
-                <Link to="/signup">
-                  <Button className="px-4 py-2">Sign Up</Button>
-                </Link>
-              </>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+              </svg>
             )}
-          </div>
-        </nav>
-      </header>
-    </>
+          </button>
+
+          {isLoggedIn ? (
+            <div className="flex items-center">
+              <Link to="/profile" className="group">
+                <div className="flex items-center gap-2.5 rounded-full border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-1.5 pl-1.5 pr-4 shadow-sm transition-all hover:shadow-md hover:border-slate-300 dark:hover:border-neutral-700">
+                  {/* Avatar */}
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 dark:bg-neutral-700 text-xs font-medium text-white">
+                    {initials || "U"}
+                  </div>
+
+                  {/* Full Name */}
+                  <span className="text-[15px] font-medium text-slate-700 dark:text-neutral-200">
+                    {userName}
+                  </span>
+
+                  {/* Logout Icon */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault(); // prevent navigation
+                      handleLogout();
+                    }}
+                    className="ml-1 rounded-full p-1.5 text-slate-400 dark:text-neutral-500 transition hover:bg-slate-100 dark:hover:bg-neutral-800 hover:text-red-500 dark:hover:text-red-400"
+                    title="Logout"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </Link>
+            </div>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="hidden text-[15px] font-medium text-slate-500 dark:text-neutral-400 transition hover:text-slate-900 dark:hover:text-white md:block"
+              >
+                Log in
+              </Link>
+              <Link to="/signup">
+                <Button className="!rounded-lg !px-4 !py-2 !text-[15px] !shadow-none">Sign up</Button>
+              </Link>
+            </>
+          )}
+        </div>
+      </nav>
+    </header>
   );
 }
