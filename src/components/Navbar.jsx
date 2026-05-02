@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from "react-router";
+import { Link, NavLink } from "react-router";
 import Button from "./ui/Button";
 
 const navItems = [
