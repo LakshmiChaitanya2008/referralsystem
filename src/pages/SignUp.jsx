@@ -51,21 +51,13 @@ export default function SignUp() {
       let parentId = null;
 
       if (trimmedReferralCode) {
-        const { data: parentProfile, error: parentError } = await supabase
+        const { data: parentProfile } = await supabase
           .from("profiles")
           .select("id")
           .eq("referral_code", trimmedReferralCode)
           .maybeSingle();
 
-        if (parentError) {
-          throw parentError;
-        }
-
-        if (!parentProfile?.id) {
-          throw new Error("Referral code is invalid.");
-        }
-
-        parentId = parentProfile.id;
+        parentId = parentProfile?.id ?? null;
       }
 
       const { error: profileError } = await supabase.from("profiles").insert({

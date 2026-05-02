@@ -1,5 +1,7 @@
 import { Link, NavLink } from "react-router";
+import { useEffect, useState } from "react";
 import Button from "./ui/Button";
+import supabase from "../lib/supabase";
 
 const navItems = [
   { name: "Home", to: "/" },
@@ -8,6 +10,62 @@ const navItems = [
 ];
 
 export default function Navbar() {
+  const [userName, setUserName] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCurrentUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (!user) {
+        setIsLoggedIn(false);
+        setUserName("");
+        return;
+      }
+
+      setIsLoggedIn(true);
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      const resolvedName =
+        profile?.name ||
+        user.user_metadata?.name ||
+        user.email?.split("@")[0] ||
+        "User";
+      setUserName(resolvedName);
+    }
+
+    loadCurrentUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      loadCurrentUser();
+    });
+
+    return () => {
+      isMounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const initials = userName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+
   return (
     <>
       <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur">
@@ -38,15 +96,28 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="hidden text-sm font-medium text-slate-700 md:block"
-            >
-              Login
-            </Link>
-            <Link to="/signup">
-              <Button className="px-4 py-2">Sign Up</Button>
-            </Link>
+            {isLoggedIn ? (
+              <Link to="/profile" className="group">
+                <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1.5 shadow-sm transition-shadow group-hover:shadow-md">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 text-xs font-semibold text-white">
+                    {initials || "U"}
+                  </div>
+                  <span className="pr-2 text-sm font-semibold text-slate-800">{userName}</span>
+                </div>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="hidden text-sm font-medium text-slate-700 md:block"
+                >
+                  Login
+                </Link>
+                <Link to="/signup">
+                  <Button className="px-4 py-2">Sign Up</Button>
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </header>
