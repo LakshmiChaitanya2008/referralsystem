@@ -5,7 +5,9 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
+import Community from "./pages/Community";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const routes = [
   { path: "/", element: <Home /> },
@@ -13,7 +15,8 @@ const routes = [
   { path: "/contact", element: <Contact /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <SignUp /> },
-  { path: "/profile", element: <Profile /> },
+  { path: "/profile", element: <ProtectedRoute><Profile /></ProtectedRoute> },
+  { path: "/community", element: <ProtectedRoute><Community /></ProtectedRoute> },
 ];
 
 export default function RoutesConfig() {

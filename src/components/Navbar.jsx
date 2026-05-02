@@ -82,7 +82,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/60 dark:border-neutral-800/60 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md py-4">
+    <header className="sticky top-0 z-50 border-b border-slate-200/50 dark:border-white/[0.06] bg-white/60 dark:bg-neutral-950/60 backdrop-blur-xl py-4">
       <nav className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6">
         {/* Logo */}
         <div className="flex flex-1 justify-start">
@@ -112,6 +112,20 @@ export default function Navbar() {
                 {item.name}
               </NavLink>
             ))}
+            {isLoggedIn && (
+              <NavLink
+                to="/community"
+                className={({ isActive }) =>
+                  `rounded-full px-4 py-1.5 text-[15px] font-medium transition-all ${
+                    isActive
+                      ? "bg-white dark:bg-neutral-800 text-slate-900 dark:text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-neutral-700/50"
+                      : "text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-neutral-800/50"
+                  }`
+                }
+              >
+                Community
+              </NavLink>
+            )}
           </div>
         </div>
 
