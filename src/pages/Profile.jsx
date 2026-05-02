@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import Card from "../components/ui/Card";
+import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import supabase from "../lib/supabase";
 
@@ -120,6 +122,53 @@ export default function Profile() {
   const [referralError, setReferralError] = useState("");
   const [referralLoading, setReferralLoading] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState("");
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({ name: "", phone: "" });
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  function openEditModal() {
+    setEditFormData({
+      name: profileData.name || "",
+      phone: profileData.phone || "",
+    });
+    setEditError("");
+    setIsEditModalOpen(true);
+  }
+
+  async function handleUpdateProfile(event) {
+    event.preventDefault();
+    setEditError("");
+    setEditLoading(true);
+
+    try {
+      const trimmedName = editFormData.name.trim();
+      const trimmedPhone = editFormData.phone.trim();
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ name: trimmedName, phone: trimmedPhone })
+        .eq("id", userId);
+
+      if (error) {
+        throw error;
+      }
+
+      setProfileData((prev) => ({
+        ...prev,
+        name: trimmedName,
+        phone: trimmedPhone,
+      }));
+      
+      toast.success("Profile updated successfully!");
+      setIsEditModalOpen(false);
+    } catch (err) {
+      setEditError(err.message || "Failed to update profile.");
+    } finally {
+      setEditLoading(false);
+    }
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -266,7 +315,7 @@ export default function Profile() {
                 <p className="text-sm text-slate-500 dark:text-neutral-400">{profileData.phone || "-"}</p>
               </div>
             </div>
-            <Button variant="secondary">Edit Profile</Button>
+            <Button variant="secondary" onClick={openEditModal}>Edit Profile</Button>
           </div>
         </div>
       </Card>
@@ -339,6 +388,48 @@ export default function Profile() {
           )}
         </div>
       </Card>
+
+      {isEditModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm dark:bg-neutral-950/80">
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-2xl dark:border dark:border-neutral-800">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Edit Profile</h2>
+            <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <Input
+                label="Full Name"
+                value={editFormData.name}
+                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                required
+              />
+              <Input
+                label="Phone Number"
+                type="tel"
+                value={editFormData.phone}
+                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+              />
+              
+              {editError ? (
+                <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400">
+                  {editError}
+                </p>
+              ) : null}
+
+              <div className="mt-6 flex justify-end gap-3">
+                <Button 
+                  type="button" 
+                  variant="secondary" 
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={editLoading}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={editLoading}>
+                  {editLoading ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
