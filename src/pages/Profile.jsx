@@ -26,7 +26,8 @@ function buildReferralTree(currentUserId, users) {
     const children = users
       .filter((candidate) => candidate.parent_id === userId)
       .map((child) => buildNode(child.id, nextVisited))
-      .filter(Boolean);
+      .filter(Boolean)
+      .slice(0, 2);
 
     return {
       ...user,
@@ -37,30 +38,59 @@ function buildReferralTree(currentUserId, users) {
   return buildNode(currentUserId);
 }
 
-function ReferralTreeNode({ node, level = 0 }) {
+function formatEmailDisplay(email) {
+  if (!email || !email.includes("@")) {
+    return email || "No email";
+  }
+
+  const [localPart, domainPart] = email.split("@");
+  if (localPart.length <= 12) {
+    return email;
+  }
+
+  return `${localPart.slice(0, 12)}...@${domainPart}`;
+}
+
+function ReferralTreeNode({ node }) {
   if (!node) {
     return null;
   }
 
+  const [leftChild, rightChild] = node.children || [];
+  const hasTwoChildren = Boolean(leftChild && rightChild);
+
   return (
-    <div className={`${level === 0 ? "flex flex-col items-center" : "ml-8 border-l-2 border-slate-200 pl-6"} space-y-4`}>
-      <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-md">
+    <div className="flex flex-col items-center gap-2">
+      <div className="w-full max-w-xs rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-md transition-transform duration-200 hover:scale-[1.03] hover:shadow-lg">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-semibold text-slate-900">{node.name || node.email || "User"}</p>
-            <p className="text-xs text-slate-500">{node.email || "No email"}</p>
+            <p className="max-w-[170px] truncate overflow-hidden whitespace-nowrap text-xs text-slate-500">
+              {formatEmailDisplay(node.email)}
+            </p>
           </div>
           <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
-            Level {level}
+            User
           </span>
         </div>
       </div>
 
-      {node.children?.length ? (
-        <div className={`w-full ${level === 0 ? "mt-2 space-y-5" : "space-y-5"}`}>
-          {node.children.map((child) => (
-            <ReferralTreeNode key={child.id} node={child} level={level + 1} />
-          ))}
+      {leftChild || rightChild ? (
+        <div className="mt-4 flex w-full flex-col items-center gap-3">
+          <div className="h-6 w-px bg-slate-300" />
+
+          <div className="relative flex w-full max-w-3xl items-start justify-center gap-12">
+            {hasTwoChildren ? (
+              <div className="absolute left-1/4 right-1/4 top-0 h-px bg-slate-300" />
+            ) : null}
+
+            {[leftChild, rightChild].map((child, index) => (
+              <div key={index} className="flex min-h-4 flex-1 flex-col items-center">
+                {child ? <div className="h-4 w-px bg-slate-300" /> : null}
+                {child ? <ReferralTreeNode node={child} /> : null}
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
     </div>
@@ -291,7 +321,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="mx-auto mt-5 max-w-3xl rounded-xl bg-slate-50 p-5">
+        <div className="mx-auto mt-6 max-w-4xl rounded-xl bg-slate-50 p-6">
           {referralTree ? (
             <ReferralTreeNode node={referralTree} />
           ) : (

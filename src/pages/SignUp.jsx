@@ -73,7 +73,7 @@ export default function SignUp() {
         throw profileError;
       }
 
-      setSuccess("Signup successful. Check your email to confirm your account.");
+      setSuccess("Signup successful. Your account has been created.");
       setFormData({
         name: "",
         email: "",
