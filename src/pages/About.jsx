@@ -1,111 +1,59 @@
-function SectionHeading({ id, children }) {
-  return (
-    <div id={id} className="mt-12 scroll-mt-24 border-b border-slate-200 dark:border-neutral-800 pb-2">
-      <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400 dark:text-neutral-500">{children}</h2>
-    </div>
-  );
-}
-
 export default function About() {
   return (
-    <div className="pb-20">
+    <div className="mx-auto max-w-4xl space-y-12 pb-10">
+      
+      {/* HEADER */}
+      <section className="text-center">
+        <h1 className="text-4xl font-bold text-slate-900 md:text-5xl mb-6">
+          About MjChits
+        </h1>
+        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          Modern chit fund service built on trust, records, and accessibility.
+        </p>
+      </section>
 
-      <div className="mb-12 border-b border-slate-200 dark:border-neutral-800 pb-6">
-        <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900 dark:text-white">About Us</h1>
-      </div>
+      {/* INTRO */}
+      <section className="rounded-2xl bg-white p-8 border border-slate-200 shadow-sm">
+        <p className="text-lg text-slate-700 leading-relaxed">
+          We combine traditional community savings with digital workflows for onboarding, collections, auctions, customer support, and administration. MjChits focuses on simple communication, verified member records, clear auction flow, and payment visibility so customers can participate with confidence.
+        </p>
+      </section>
 
-      <div className="flex flex-col gap-5 md:flex-row md:items-start">
-
-        <article className="flex-1 min-w-0 text-[18px] leading-10 text-slate-600 dark:text-neutral-300">
-
-          <p>
-            <strong className="font-semibold text-slate-900 dark:text-white">LocalBazaar</strong> is an
-            invite-only marketplace designed to connect local sellers and buyers through
-            trusted referral networks. The platform uses a binary referral model — each
-            member may directly invite a maximum of two people — ensuring every participant
-            has been personally vouched for before joining.
+      {/* VALUES */}
+      <section className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-2xl bg-blue-50/50 p-8 border border-blue-100">
+          <div className="text-3xl mb-4">🔍</div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Transparent operations</h3>
+          <p className="text-slate-600">
+            Members should be able to understand their group value, installment cycle, auction result, dividend distribution, and pending dues without confusion.
           </p>
-          <p className="mt-4">
-            Unlike conventional e-commerce platforms, growth on LocalBazaar is slow and
-            deliberate. The constraint is architectural: it embeds accountability into the
-            platform's structure rather than relying on moderation after the fact.
+        </div>
+
+        <div className="rounded-2xl bg-indigo-50/50 p-8 border border-indigo-100">
+          <div className="text-3xl mb-4">👥</div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Community-first savings</h3>
+          <p className="text-slate-600">
+            Chit funds work best when groups are managed with discipline. Our process supports savers, bidders, field agents, and branch staff in one operating flow.
           </p>
+        </div>
 
-          <SectionHeading id="history">History</SectionHeading>
-          <p className="mt-4">
-            LocalBazaar launched in early 2023 with twelve founding sellers in Bangalore's
-            Indiranagar neighborhood, after its founders observed that high-quality local
-            producers — home cooks, weavers, farmers — had no reliable way to reach nearby
-            customers beyond word-of-mouth.
+        <div className="rounded-2xl bg-emerald-50/50 p-8 border border-emerald-100">
+          <div className="text-3xl mb-4">🛡️</div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Verification and control</h3>
+          <p className="text-slate-600">
+            KYC, user roles, branch records, payment receipts, and approval steps help reduce operational risk and keep financial activity accountable.
           </p>
-          <p className="mt-4">
-            Within thirty days of launch, the binary referral model grew the seller count to
-            over 500 with zero paid marketing. By Q3 2024 the platform had expanded to
-            Mysore, Hubli, and Mangalore, crossing ₹1 Crore in gross merchandise value
-            (GMV). As of 2025, over 2,400 verified sellers and 12,000 listed products are
-            active across six Karnataka cities.
+        </div>
+
+        <div className="rounded-2xl bg-purple-50/50 p-8 border border-purple-100">
+          <div className="text-3xl mb-4">📱</div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Digital convenience</h3>
+          <p className="text-slate-600">
+            The platform supports mobile-first access for customers and agents while keeping admin teams equipped with web-based monitoring and reporting.
           </p>
+        </div>
+      </section>
 
-          <SectionHeading id="how-it-works">How It Works</SectionHeading>
-          <p className="mt-4">
-            Membership requires a referral code from an existing member. Upon signing up,
-            each user receives their own unique referral code and may extend it to two
-            others, forming a binary tree of connected accounts. Every node in the tree is
-            traceable back to a founding member.
-          </p>
-          <p className="mt-4">
-            Each profile page renders a live visualization of the user's referral network,
-            showing direct referrals at depth one and indirect referrals at depth two and
-            beyond. Referral codes are case-normalized to uppercase and validated for
-            uniqueness platform-wide before activation.
-          </p>
-
-          <SectionHeading id="values">Core Values</SectionHeading>
-          <div className="mt-4 space-y-4">
-            {[
-              ["Community First", "Every product decision begins with a simple question: does this strengthen local commerce?"],
-              ["Trust by Design", "The referral limit is architectural, not a moderation strategy. Every connection implies a real relationship."],
-              ["Hyperlocal Focus", "Proximity and neighborhood relevance are first-class product attributes. This is not a pan-India marketplace."],
-              ["Sustainable Growth", "The platform favors depth of trust over breadth of reach, and always will."],
-            ].map(([term, def]) => (
-              <div key={term} className="flex gap-3">
-                <div className="mt-[11px] h-1 w-1 shrink-0 rounded-full bg-slate-400 dark:bg-neutral-600" />
-                <p>
-                  <span className="font-medium text-slate-800 dark:text-neutral-200">{term}</span>
-                  <span className="text-slate-500 dark:text-neutral-500"> — {def}</span>
-                </p>
-              </div>
-            ))}
-          </div>
-
-    
-        </article>
-
-        <aside className="w-full shrink-0 md:w-56">
-          <div className="rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 overflow-hidden">
-            <div className="px-4 py-3 border-b border-slate-200 dark:border-neutral-800">
-              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-neutral-500">Quick Facts</p>
-            </div>
-            <div className="px-4 py-4 space-y-4">
-              {[
-                ["Founded", "2023"],
-                ["Headquarters", "Bangalore, India"],
-                ["Model", "Binary Referral"],
-                ["Sellers", "2,400+"],
-                ["Products", "12,000+"],
-                ["GMV", "₹4.2 Crore"],
-                ["Cities", "6 in Karnataka"],
-              ].map(([label, value]) => (
-                <div key={label}>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-neutral-600">{label}</p>
-                  <p className="mt-0.5 text-sm text-slate-700 dark:text-neutral-300">{value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
-
-      </div>
     </div>
   );
 }

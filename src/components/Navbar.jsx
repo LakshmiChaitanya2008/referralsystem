@@ -8,6 +8,8 @@ import { useTheme } from "../context/ThemeContext";
 const navItems = [
   { name: "Home", to: "/" },
   { name: "About", to: "/about" },
+  { name: "Services", to: "/services" },
+  { name: "Branches", to: "/branch" },
   { name: "Contact", to: "/contact" },
 ];
 
@@ -90,7 +92,7 @@ export default function Navbar() {
             to="/"
             className="text-lg font-bold tracking-tight text-slate-900 dark:text-white transition hover:opacity-80"
           >
-            LocalBazaar
+            MjChits
           </Link>
         </div>
 
