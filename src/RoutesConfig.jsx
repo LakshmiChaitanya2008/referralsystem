@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Services from "./pages/Services";
+import Branches from "./pages/Branches";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
@@ -12,6 +14,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 const routes = [
   { path: "/", element: <Home /> },
   { path: "/about", element: <About /> },
+  { path: "/services", element: <Services /> },
+  { path: "/branch", element: <Branches /> },
   { path: "/contact", element: <Contact /> },
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <SignUp /> },
