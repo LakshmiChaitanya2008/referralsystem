@@ -6,6 +6,19 @@
 @theme {
   --color-brand-primary: #3b82f6;
   --color-brand-secondary: #4648d4;
+
+  --animate-page-enter: page-enter 0.4s ease-out forwards;
+
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 :root {
