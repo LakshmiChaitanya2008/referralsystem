@@ -90,9 +90,17 @@ export default function Navbar() {
         <div className="flex flex-1 justify-start">
           <Link
             to="/"
-            className="text-lg font-bold tracking-tight text-slate-900 dark:text-white transition hover:opacity-80"
+            className="flex items-center gap-2.5 transition hover:opacity-80"
           >
-            MjChits
+            <img src="/logo.jpeg" alt="Mj Chits Logo" className="h-11 w-11 rounded-full object-cover border border-slate-100 dark:border-neutral-800" />
+            <div className="flex flex-col">
+              <span className="text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
+                Mj Chits
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-neutral-400">
+                Private Limited
+              </span>
+            </div>
           </Link>
         </div>
 

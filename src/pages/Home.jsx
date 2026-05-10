@@ -77,7 +77,7 @@ export default function Home() {
         </h1>
 
         <p className="relative mt-5 max-w-2xl text-base text-slate-600 dark:text-neutral-400 md:text-lg">
-          MjChits helps members join structured chit groups, follow payment schedules, receive auction updates, and access branch or agent support with clear records.
+          Mj Chits helps members join structured chit groups, follow payment schedules, receive auction updates, and access branch or agent support with clear records.
         </p>
 
         <div className="relative mt-8 flex flex-wrap gap-3">
@@ -145,7 +145,7 @@ export default function Home() {
           Digital chit services
         </h2>
         <p className="relative mt-3 mx-auto max-w-2xl text-slate-600 dark:text-neutral-400">
-          MjChits provides structured chit groups, transparent auctions, digital receipts, branch support, and customer-first servicing for community savings.
+          Mj Chits provides structured chit groups, transparent auctions, digital receipts, branch support, and customer-first servicing for community savings.
         </p>
         <div className="relative mt-8 flex flex-wrap justify-center gap-4">
           {!isLoggedIn ? (

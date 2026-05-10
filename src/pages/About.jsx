@@ -5,7 +5,7 @@ export default function About() {
       {/* HEADER */}
       <section className="text-center">
         <h1 className="text-4xl font-bold text-slate-900 dark:text-white md:text-5xl mb-6">
-          About MjChits
+          About Mj Chits
         </h1>
         <p className="text-xl text-slate-600 dark:text-neutral-400 max-w-2xl mx-auto">
           Modern chit fund service built on trust, records, and accessibility.
@@ -15,7 +15,7 @@ export default function About() {
       {/* INTRO */}
       <section className="rounded-2xl bg-white dark:bg-neutral-900 p-8 border border-slate-200 dark:border-neutral-800 shadow-sm">
         <p className="text-lg text-slate-700 dark:text-neutral-300 leading-relaxed">
-          We combine traditional community savings with digital workflows for onboarding, collections, auctions, customer support, and administration. MjChits focuses on simple communication, verified member records, clear auction flow, and payment visibility so customers can participate with confidence.
+          We combine traditional community savings with digital workflows for onboarding, collections, auctions, customer support, and administration. Mj Chits focuses on simple communication, verified member records, clear auction flow, and payment visibility so customers can participate with confidence.
         </p>
       </section>
 

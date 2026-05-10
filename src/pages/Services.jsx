@@ -33,7 +33,7 @@ export default function Services() {
           Chit fund services designed for clarity at every step.
         </h1>
         <p className="text-xl text-slate-600 dark:text-neutral-400 max-w-3xl mx-auto">
-          From customer onboarding to auction records and receipts, MjChits supports the full lifecycle of a chit group.
+          From customer onboarding to auction records and receipts, Mj Chits supports the full lifecycle of a chit group.
         </p>
       </section>
 

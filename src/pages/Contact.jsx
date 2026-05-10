@@ -4,7 +4,7 @@ export default function Contact() {
       <section className="text-center mb-12">
         <h1 className="text-4xl font-bold text-slate-900 dark:text-white md:text-5xl mb-6">Contact Us</h1>
         <p className="text-xl text-slate-600 dark:text-neutral-400 max-w-2xl mx-auto">
-          Need help with a chit group, payment, auction, or account? Reach the MjChits support team for customer service, branch assistance, agent coordination, and business enquiries.
+          Need help with a chit group, payment, auction, or account? Reach the Mj Chits support team for customer service, branch assistance, agent coordination, and business enquiries.
         </p>
       </section>
 
