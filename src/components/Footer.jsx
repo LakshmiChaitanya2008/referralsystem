@@ -7,11 +7,19 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           {/* Brand Info */}
           <div className="col-span-2 lg:col-span-2">
-            <Link to="/" className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              MjChits
+            <Link to="/" className="flex items-center gap-3.5 transition hover:opacity-80">
+              <img src="/logo.jpeg" alt="Mj Chits Logo" className="h-14 w-14 rounded-full object-cover border border-slate-100 dark:border-neutral-800" />
+              <div className="flex flex-col">
+                <span className="text-xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
+                  Mj Chits
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-neutral-400">
+                  Private Limited
+                </span>
+              </div>
             </Link>
             <p className="mt-4 text-sm text-slate-500 dark:text-neutral-400 max-w-xs leading-relaxed">
-              MjChits provides structured chit groups, transparent auctions, digital receipts, branch support, and customer-first servicing for community savings.
+              Mj Chits provides structured chit groups, transparent auctions, digital receipts, branch support, and customer-first servicing for community savings.
             </p>
           </div>
 
@@ -51,7 +59,7 @@ export default function Footer() {
 
         <div className="mt-12 pt-8 border-t border-slate-200 dark:border-white/[0.06] flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-slate-500 dark:text-neutral-400">
-            © 2026 MjChits Pvt Ltd. All rights reserved.
+            © 2026 Mj Chits Private Limited. All rights reserved.
           </p>
           <p className="text-sm text-slate-500 dark:text-neutral-400">
             Hyderabad, Telangana, India
