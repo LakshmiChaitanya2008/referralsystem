@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Button from "../components/ui/Button";
 import supabase from "../lib/supabase";
+import ChitCarousel from "../components/ChitCarousel";
 
 const highlights = [
   { label: "Member Overview", value: "Live group status" },
@@ -103,6 +104,11 @@ export default function Home() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── CAROUSEL ── */}
+      <section>
+        <ChitCarousel />
       </section>
 
       {/* ── FEATURES ── */}
