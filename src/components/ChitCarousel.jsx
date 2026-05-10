@@ -1,10 +1,31 @@
 import { useState, useRef, useEffect } from "react";
+import FlipbookViewer from "./FlipbookViewer";
 
 const carouselImages = [
-  { id: 1, src: "/carousel/image1.jpg", alt: "40 Lakhs Chit Referral" },
-  { id: 2, src: "/carousel/image2.jpg", alt: "20 Lakhs Chit Referral" },
-  { id: 3, src: "/carousel/image3.jpg", alt: "10 Lakhs Chit Referral" },
-  { id: 4, src: "/carousel/image4.jpg", alt: "5 Lakhs Chit Referral" },
+  { 
+    id: 1, 
+    src: "/carousel/image1.jpg", 
+    alt: "40 Lakhs Chit Referral",
+    pages: Array.from({length: 9}, (_, i) => `/flipbooks/doc1/${i+1}.jpg`)
+  },
+  { 
+    id: 2, 
+    src: "/carousel/image2.jpg", 
+    alt: "20 Lakhs Chit Referral",
+    pages: Array.from({length: 9}, (_, i) => `/flipbooks/doc2/${i+1}.jpg`)
+  },
+  { 
+    id: 3, 
+    src: "/carousel/image3.jpg", 
+    alt: "10 Lakhs Chit Referral",
+    pages: Array.from({length: 9}, (_, i) => `/flipbooks/doc3/${i+1}.jpg`)
+  },
+  { 
+    id: 4, 
+    src: "/carousel/image4.jpg", 
+    alt: "5 Lakhs Chit Referral",
+    pages: Array.from({length: 9}, (_, i) => `/flipbooks/doc4/${i+1}.jpg`)
+  },
 ];
 
 // Triplicate the images to allow seamless infinite scrolling in both directions
@@ -125,6 +146,7 @@ export default function ChitCarousel() {
             key={`${img.id}-${idx}`} 
             className="relative flex-shrink-0 w-[280px] sm:w-[320px] md:w-[400px] overflow-hidden rounded-2xl shadow-md border border-slate-200 dark:border-neutral-800 transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl select-none"
             onClick={() => {
+              // Only open if it wasn't a drag interaction
               if (!isDragging.current) setSelectedImage(img);
             }}
           >
@@ -138,41 +160,19 @@ export default function ChitCarousel() {
             />
             <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors duration-300 rounded-2xl flex items-center justify-center cursor-pointer">
               <span className="opacity-0 hover:opacity-100 bg-white/90 text-slate-900 px-4 py-2 rounded-full font-medium shadow-sm transition-opacity duration-300 pointer-events-none">
-                Click to view
+                Click to open book
               </span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Full Document Modal */}
+      {/* Full Document Flipbook Viewer Modal */}
       {selectedImage && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div 
-            className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button 
-              className="absolute -top-12 right-0 sm:-right-12 sm:top-0 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
-              onClick={() => setSelectedImage(null)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <img 
-              src={selectedImage.src} 
-              alt={selectedImage.alt} 
-              className="w-full h-auto max-h-[85vh] object-contain rounded-lg shadow-2xl"
-              onError={(e) => {
-                e.target.src = `https://via.placeholder.com/1200x800/1e3a8a/ffffff?text=${selectedImage.alt.replace(/ /g, '+')}`;
-              }}
-            />
-          </div>
-        </div>
+        <FlipbookViewer 
+          pages={selectedImage.pages} 
+          onClose={() => setSelectedImage(null)} 
+        />
       )}
     </div>
   );
