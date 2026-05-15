@@ -1,6 +1,7 @@
 import supabase from "./supabase";
 import { authEmailFromUserId, buildUserId, USER_ID_PATTERN } from "./userIdAuth";
 import { isValidPhone } from "../components/PhoneField";
+import { isMemberProfile } from "./memberProfile";
 import { countDirectReferrals, validateMemberLink } from "./memberReferral";
 import { isReferralLimitReached, referralLimitMessage } from "./referralLimits";
 
@@ -59,12 +60,12 @@ export async function createMemberAsAdmin({
   if (referrerId) {
     const { data: referrer, error: referrerError } = await supabase
       .from("profiles")
-      .select("id")
+      .select("id, user_id")
       .eq("id", referrerId)
       .maybeSingle();
 
     if (referrerError) throw referrerError;
-    if (!referrer) {
+    if (!referrer || !isMemberProfile(referrer)) {
       throw new Error("Selected referrer was not found.");
     }
 
@@ -121,7 +122,8 @@ export async function createMemberAsAdmin({
 }
 
 export async function linkMemberToReferrer({ memberId, referrerId, profiles }) {
-  const linkError = validateMemberLink({ memberId, referrerId, profiles });
+  const members = (profiles || []).filter(isMemberProfile);
+  const linkError = validateMemberLink({ memberId, referrerId, profiles: members });
   if (linkError) {
     throw new Error(linkError);
   }
