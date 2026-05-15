@@ -4,7 +4,8 @@ export default function ReferralTreeNode({ node, badgeLabel = "User" }) {
   }
 
   const children = node.children || [];
-  const hasTwoChildren = children.length === 2;
+  const childCount = children.length;
+  const hasMultipleChildren = childCount > 1;
 
   return (
     <div className="flex flex-col items-center">
@@ -29,34 +30,23 @@ export default function ReferralTreeNode({ node, badgeLabel = "User" }) {
         </div>
       </div>
 
-      {children.length > 0 ? (
+      {childCount > 0 ? (
         <div className="flex w-full flex-col items-center">
-          <div className={`w-px bg-slate-300 dark:bg-neutral-700 ${hasTwoChildren ? "h-6" : "h-10"}`} />
+          <div className={`w-px bg-slate-300 dark:bg-neutral-700 ${hasMultipleChildren ? "h-6" : "h-10"}`} />
 
-          <div className="relative flex w-full min-w-max items-start justify-center">
-            {children.map((child, index) => {
-              const isLeftChild = index === 0;
-              const isRightChild = index === 1;
+          <div className="relative flex w-full min-w-max flex-wrap items-start justify-center gap-2 sm:gap-4">
+            {hasMultipleChildren ? (
+              <div className="absolute top-0 right-[8%] left-[8%] h-px bg-slate-300 dark:bg-neutral-700" />
+            ) : null}
 
-              return (
-                <div
-                  key={child.id}
-                  className="relative flex min-h-4 flex-1 flex-col items-center px-2 sm:px-4"
-                >
-                  {hasTwoChildren && isLeftChild ? (
-                    <div className="absolute top-0 right-0 left-1/2 h-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-                  {hasTwoChildren && isRightChild ? (
-                    <div className="absolute top-0 left-0 right-1/2 h-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-
-                  {hasTwoChildren ? (
-                    <div className="h-4 w-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-                  <ReferralTreeNode node={child} badgeLabel={badgeLabel} />
-                </div>
-              );
-            })}
+            {children.map((child) => (
+              <div key={child.id} className="relative flex min-h-4 flex-col items-center px-1 sm:px-3">
+                {hasMultipleChildren ? (
+                  <div className="h-4 w-px bg-slate-300 dark:bg-neutral-700" />
+                ) : null}
+                <ReferralTreeNode node={child} badgeLabel={badgeLabel} />
+              </div>
+            ))}
           </div>
         </div>
       ) : null}

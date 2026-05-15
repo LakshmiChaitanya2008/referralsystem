@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Card from "../components/ui/Card";
 import ReferralTreeNode from "../components/ReferralTreeNode";
 import StandaloneMemberCard from "../components/StandaloneMemberCard";
+import AdminCreateMemberForm from "../components/admin/AdminCreateMemberForm";
+import AdminLinkMemberForm from "../components/admin/AdminLinkMemberForm";
 import supabase from "../lib/supabase";
 import {
   buildReferralForest,
@@ -28,35 +30,34 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadData() {
+  const loadProfiles = useCallback(async (silent = false) => {
+    if (!silent) {
       setLoading(true);
-      setError("");
+    }
+    setError("");
 
-      const { data, error: fetchError } = await supabase
-        .from("profiles")
-        .select("id, name, user_id, phone, referral_code, parent_id")
-        .order("name", { ascending: true });
+    const { data, error: fetchError } = await supabase
+      .from("profiles")
+      .select("id, name, user_id, phone, referral_code, parent_id")
+      .order("name", { ascending: true });
 
-      if (!isMounted) return;
-
-      if (fetchError) {
-        setError(fetchError.message || "Could not load members.");
-        setLoading(false);
-        return;
+    if (fetchError) {
+      setError(fetchError.message || "Could not load members.");
+      if (!silent) {
+        setProfiles([]);
       }
-
+    } else {
       setProfiles(data || []);
-      setLoading(false);
     }
 
-    loadData();
-    return () => {
-      isMounted = false;
-    };
+    if (!silent) {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadProfiles();
+  }, [loadProfiles]);
 
   const forest = useMemo(() => buildReferralForest(profiles), [profiles]);
   const standaloneMembers = useMemo(() => getStandaloneProfiles(profiles), [profiles]);
@@ -101,7 +102,7 @@ export default function AdminDashboard() {
           Admin Dashboard
         </h1>
         <p className="mt-2 text-slate-600 dark:text-neutral-400">
-          View all members, referral trees, and individuals with no connections.
+          Create members, link referrals manually, and view the full network.
         </p>
       </div>
 
@@ -116,6 +117,11 @@ export default function AdminDashboard() {
         <StatCard label="In Networks" value={stats.inTrees} hint="Connected in a referral tree" />
         <StatCard label="Individuals" value={stats.standalone} hint="No referrer and no referrals" />
         <StatCard label="Referral Trees" value={stats.connectedTrees} hint="Root networks with connections" />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <AdminCreateMemberForm profiles={profiles} onSuccess={() => loadProfiles(true)} />
+        <AdminLinkMemberForm profiles={profiles} onSuccess={() => loadProfiles(true)} />
       </div>
 
       <Card title="All Members" description={`${profiles.length} registered members.`}>
@@ -192,7 +198,7 @@ export default function AdminDashboard() {
 
       <Card
         title="Referral Network Trees"
-        description="Members connected through referral codes (binary tree, max 2 per level)."
+        description="Members connected through referrals (one parent, max 4 direct children per parent)."
       >
         {forest.length === 0 ? (
           <p className="text-sm text-slate-600 dark:text-neutral-400">

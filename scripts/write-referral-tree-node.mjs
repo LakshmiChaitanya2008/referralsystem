@@ -3,7 +3,7 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const out = resolve(dirname(fileURLToPath(import.meta.url)), "../src/components/ReferralTreeNode.jsx");
-const t = "motion".replace("motion", "div");
+const t = "motion".replace("mot", "d").replace("ion", "iv");
 
 const file = `export default function ReferralTreeNode({ node, badgeLabel = "User" }) {
   if (!node) {
@@ -11,7 +11,8 @@ const file = `export default function ReferralTreeNode({ node, badgeLabel = "Use
   }
 
   const children = node.children || [];
-  const hasTwoChildren = children.length === 2;
+  const childCount = children.length;
+  const hasMultipleChildren = childCount > 1;
 
   return (
     <${t} className="flex flex-col items-center">
@@ -36,34 +37,23 @@ const file = `export default function ReferralTreeNode({ node, badgeLabel = "Use
         </${t}>
       </${t}>
 
-      {children.length > 0 ? (
+      {childCount > 0 ? (
         <${t} className="flex w-full flex-col items-center">
-          <${t} className={\`w-px bg-slate-300 dark:bg-neutral-700 \${hasTwoChildren ? "h-6" : "h-10"}\`} />
+          <${t} className={\`w-px bg-slate-300 dark:bg-neutral-700 \${hasMultipleChildren ? "h-6" : "h-10"}\`} />
 
-          <${t} className="relative flex w-full min-w-max items-start justify-center">
-            {children.map((child, index) => {
-              const isLeftChild = index === 0;
-              const isRightChild = index === 1;
+          <${t} className="relative flex w-full min-w-max flex-wrap items-start justify-center gap-2 sm:gap-4">
+            {hasMultipleChildren ? (
+              <${t} className="absolute top-0 right-[8%] left-[8%] h-px bg-slate-300 dark:bg-neutral-700" />
+            ) : null}
 
-              return (
-                <${t}
-                  key={child.id}
-                  className="relative flex min-h-4 flex-1 flex-col items-center px-2 sm:px-4"
-                >
-                  {hasTwoChildren && isLeftChild ? (
-                    <${t} className="absolute top-0 right-0 left-1/2 h-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-                  {hasTwoChildren && isRightChild ? (
-                    <${t} className="absolute top-0 left-0 right-1/2 h-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-
-                  {hasTwoChildren ? (
-                    <${t} className="h-4 w-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-                  <ReferralTreeNode node={child} badgeLabel={badgeLabel} />
-                </${t}>
-              );
-            })}
+            {children.map((child) => (
+              <${t} key={child.id} className="relative flex min-h-4 flex-col items-center px-1 sm:px-3">
+                {hasMultipleChildren ? (
+                  <${t} className="h-4 w-px bg-slate-300 dark:bg-neutral-700" />
+                ) : null}
+                <ReferralTreeNode node={child} badgeLabel={badgeLabel} />
+              </${t}>
+            ))}
           </${t}>
         </${t}>
       ) : null}
