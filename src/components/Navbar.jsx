@@ -70,12 +70,24 @@ export default function Navbar() {
     };
   }, []);
 
-  const initials = userName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
+  const safeName = userName.trim() || "User";
+  const nameParts = safeName.split(/\s+/).filter(Boolean);
+  let initials = "";
+
+  if (nameParts.length >= 2) {
+    initials = `${nameParts[0]?.[0] ?? ""}${nameParts[1]?.[0] ?? ""}`;
+  } else if (nameParts[0]) {
+    initials = nameParts[0].slice(0, 2);
+  }
+
+  initials = (initials || "US").toUpperCase();
+
+  if (initials.length === 1) {
+    initials = `${initials}${initials}`;
+  }
+
+  const profileHref = isAdmin ? "/admin" : "/profile";
+  const profileLabel = isAdmin ? "Admin dashboard" : "My profile";
 
   async function handleLogout() {
     setIsLoggingOut(true);
@@ -176,40 +188,26 @@ export default function Navbar() {
           </button>
 
           {isLoggedIn ? (
-            <div className="flex items-center gap-3">
-              {isAdmin ? (
-                <Link
-                  to="/admin"
-                  className="hidden text-[15px] font-medium text-slate-600 hover:text-slate-900 dark:text-neutral-300 dark:hover:text-white md:block"
-                >
-                  Admin Panel
-                </Link>
-              ) : (
-                <Link
-                  to="/profile"
-                  className="hidden text-[15px] font-medium text-slate-600 hover:text-slate-900 dark:text-neutral-300 dark:hover:text-white md:block"
-                >
-                  My Profile
-                </Link>
-              )}
-              <div className="flex items-center gap-2.5 rounded-full border border-slate-200 bg-white py-1.5 pl-1.5 pr-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-medium text-white dark:bg-neutral-700">
-                  {initials || "U"}
-                </div>
-                <span className="text-[15px] font-medium text-slate-700 dark:text-neutral-200">
-                  {userName}
-                </span>
-                <button
-                  onClick={handleLogout}
-                  disabled={isLoggingOut}
-                  className="ml-1 rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-red-500 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-red-400"
-                  title="Logout"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1" />
-                  </svg>
-                </button>
-              </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link
+                to={profileHref}
+                title={profileLabel}
+                aria-label={profileLabel}
+                className="group flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-[11px] font-semibold uppercase tracking-[0.12em] text-white shadow-sm ring-1 ring-slate-200/70 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-slate-300 dark:bg-neutral-800 dark:text-white dark:ring-neutral-700 sm:h-10 sm:w-10 sm:text-xs"
+              >
+                {initials}
+              </Link>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="rounded-full border border-slate-200/70 bg-white p-2 text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-red-500 disabled:opacity-60 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:border-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-red-400"
+                title="Logout"
+                aria-label="Logout"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1" />
+                </svg>
+              </button>
             </div>
           ) : (
             <>
