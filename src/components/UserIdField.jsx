@@ -1,6 +1,33 @@
 import { USER_ID_PREFIX } from "../lib/userIdAuth";
+import {
+  blockNonNumericKey,
+  handleNumericPaste,
+  sanitizeNumeric,
+} from "../lib/numericInput";
+
+const USER_ID_DIGIT_LENGTH = 9;
+
+function sanitizeDigits(value) {
+  return sanitizeNumeric(value, USER_ID_DIGIT_LENGTH);
+}
 
 export default function UserIdField({ digits, onDigitsChange, id = "user-id-digits" }) {
+  function updateDigits(nextValue) {
+    onDigitsChange(sanitizeDigits(nextValue));
+  }
+
+  function handleChange(event) {
+    updateDigits(event.target.value);
+  }
+
+  function handleKeyDown(event) {
+    blockNonNumericKey(event);
+  }
+
+  function handlePaste(event) {
+    handleNumericPaste(event, digits, USER_ID_DIGIT_LENGTH, updateDigits);
+  }
+
   return (
     <div className="w-full space-y-2">
       <label
@@ -16,8 +43,11 @@ export default function UserIdField({ digits, onDigitsChange, id = "user-id-digi
         <input
           id={id}
           name="userIdDigits"
+          type="tel"
           value={digits}
-          onChange={onDigitsChange}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           inputMode="numeric"
           autoComplete="username"
           placeholder="123456789"

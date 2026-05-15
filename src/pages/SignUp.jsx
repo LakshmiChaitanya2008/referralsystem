@@ -5,6 +5,7 @@ import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import UserIdField from "../components/UserIdField";
+import PhoneField, { isValidPhone } from "../components/PhoneField";
 import supabase from "../lib/supabase";
 import {
   USER_ID_PATTERN,
@@ -29,9 +30,12 @@ export default function SignUp() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleUserIdDigitsChange(event) {
-    const digits = event.target.value.replace(/\D/g, "").slice(0, 9);
+  function handleUserIdDigitsChange(digits) {
     setFormData((prev) => ({ ...prev, userIdDigits: digits }));
+  }
+
+  function handlePhoneChange(phone) {
+    setFormData((prev) => ({ ...prev, phone }));
   }
 
   async function handleSignUp(event) {
@@ -49,6 +53,10 @@ export default function SignUp() {
         throw new Error(
           "User ID must start with MJ followed by exactly 9 digits (e.g. MJ123456789).",
         );
+      }
+
+      if (!isValidPhone(trimmedPhone)) {
+        throw new Error("Phone number must be exactly 10 digits.");
       }
 
       const { data: existingUser, error: userIdLookupError } = await supabase
@@ -164,15 +172,10 @@ export default function SignUp() {
             digits={formData.userIdDigits}
             onDigitsChange={handleUserIdDigitsChange}
           />
-          <Input
+          <PhoneField
             id="signup-phone"
-            name="phone"
             value={formData.phone}
-            onChange={handleChange}
-            type="tel"
-            label="Phone"
-            placeholder="+91 1234567890"
-            required
+            onChange={handlePhoneChange}
           />
           <Input
             id="signup-password"

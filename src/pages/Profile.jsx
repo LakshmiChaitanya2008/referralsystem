@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import PhoneField, { isValidPhone } from "../components/PhoneField";
 import supabase from "../lib/supabase";
 
 function Skeleton({ className }) {
@@ -140,6 +141,10 @@ export default function Profile() {
     try {
       const trimmedName = editFormData.name.trim();
       const trimmedPhone = editFormData.phone.trim();
+
+      if (!isValidPhone(trimmedPhone)) {
+        throw new Error("Phone number must be exactly 10 digits.");
+      }
 
       const { error } = await supabase
         .from("profiles")
@@ -474,11 +479,11 @@ export default function Profile() {
                 onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
                 required
               />
-              <Input
+              <PhoneField
+                id="edit-phone"
                 label="Phone Number"
-                type="tel"
                 value={editFormData.phone}
-                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                onChange={(phone) => setEditFormData({ ...editFormData, phone })}
               />
               
               {editError ? (

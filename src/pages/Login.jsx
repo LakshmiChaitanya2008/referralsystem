@@ -20,8 +20,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  function handleUserIdDigitsChange(event) {
-    const digits = event.target.value.replace(/\D/g, "").slice(0, 9);
+  function handleUserIdDigitsChange(digits) {
     setUserIdDigits(digits);
   }
 
