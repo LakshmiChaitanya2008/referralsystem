@@ -1,0 +1,2 @@
+-- Deprecated: replaced by 20260515300000_admin_email_policy.sql
+-- Admin uses email admin@mjchits@gmail.com only (not is_admin on profiles).

@@ -3,6 +3,8 @@ import { Link } from "react-router";
 import Button from "../components/ui/Button";
 import supabase from "../lib/supabase";
 import ChitCarousel from "../components/ChitCarousel";
+import useIsAdmin from "../hooks/useIsAdmin";
+import { isAdminEmail } from "../lib/adminAuth";
 
 const highlights = [
   { label: "Member Overview", value: "Live group status" },
@@ -54,13 +56,14 @@ const features = [
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAdmin } = useIsAdmin();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsLoggedIn(!!session);
+      setIsLoggedIn(!!session && !isAdminEmail(session.user?.email));
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session);
+      setIsLoggedIn(!!session && !isAdminEmail(session.user?.email));
     });
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -160,9 +163,9 @@ export default function Home() {
               </Link>
             </>
           ) : (
-            <Link to="/profile">
+            <Link to={isAdmin ? "/admin" : "/profile"}>
               <Button className="bg-blue-600 !text-white hover:bg-blue-700 shadow-md px-8">
-                Go to Dashboard
+                {isAdmin ? "Admin Dashboard" : "Go to Dashboard"}
               </Button>
             </Link>
           )}
