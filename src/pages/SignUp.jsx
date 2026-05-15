@@ -4,38 +4,75 @@ import toast from "react-hot-toast";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import UserIdField from "../components/UserIdField";
+import PhoneField, { isValidPhone } from "../components/PhoneField";
 import supabase from "../lib/supabase";
+import {
+  USER_ID_PATTERN,
+  authEmailFromUserId,
+  buildUserId,
+} from "../lib/userIdAuth";
 
 export default function SignUp() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    userIdDigits: "",
     phone: "",
     password: "",
     referralCode: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
+  function handleUserIdDigitsChange(digits) {
+    setFormData((prev) => ({ ...prev, userIdDigits: digits }));
+  }
+
+  function handlePhoneChange(phone) {
+    setFormData((prev) => ({ ...prev, phone }));
+  }
+
   async function handleSignUp(event) {
     event.preventDefault();
     setError("");
-    setSuccess("");
     setLoading(true);
 
     const trimmedName = formData.name.trim();
-    const trimmedEmail = formData.email.trim();
     const trimmedPhone = formData.phone.trim();
     const trimmedReferralCode = formData.referralCode.trim();
+    const userId = buildUserId(formData.userIdDigits);
 
     try {
+      if (!USER_ID_PATTERN.test(userId)) {
+        throw new Error(
+          "User ID must start with MJ followed by exactly 9 digits (e.g. MJ123456789).",
+        );
+      }
+
+      if (!isValidPhone(trimmedPhone)) {
+        throw new Error("Phone number must be exactly 10 digits.");
+      }
+
+      const { data: existingUser, error: userIdLookupError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (userIdLookupError) throw userIdLookupError;
+
+      if (existingUser) {
+        throw new Error(
+          "This user ID is already used by another account. Please choose a different one.",
+        );
+      }
+
       let parentId = null;
 
       if (trimmedReferralCode) {
@@ -66,7 +103,7 @@ export default function SignUp() {
       }
 
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: trimmedEmail,
+        email: authEmailFromUserId(userId),
         password: formData.password,
       });
 
@@ -81,7 +118,7 @@ export default function SignUp() {
 
       const { error: profileError } = await supabase.from("profiles").insert({
         id: user.id,
-        email: trimmedEmail,
+        user_id: userId,
         name: trimmedName,
         phone: trimmedPhone,
         referral_code: null,
@@ -89,15 +126,20 @@ export default function SignUp() {
       });
 
       if (profileError) {
+        if (profileError.code === "23505") {
+          throw new Error(
+            "This user ID is already used by another account. Please choose a different one.",
+          );
+        }
         throw profileError;
       }
 
       toast.success("Signup successful!");
       navigate("/");
-      
+
       setFormData({
         name: "",
-        email: "",
+        userIdDigits: "",
         phone: "",
         password: "",
         referralCode: "",
@@ -125,25 +167,15 @@ export default function SignUp() {
             placeholder="Laksh Sharma"
             required
           />
-          <Input
-            id="signup-email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            type="email"
-            label="Email"
-            placeholder="you@company.com"
-            required
+          <UserIdField
+            id="signup-user-id-digits"
+            digits={formData.userIdDigits}
+            onDigitsChange={handleUserIdDigitsChange}
           />
-          <Input
+          <PhoneField
             id="signup-phone"
-            name="phone"
             value={formData.phone}
-            onChange={handleChange}
-            type="tel"
-            label="Phone"
-            placeholder="+91 1234567890"
-            required
+            onChange={handlePhoneChange}
           />
           <Input
             id="signup-password"
@@ -153,6 +185,7 @@ export default function SignUp() {
             type="password"
             label="Password"
             placeholder="••••••••"
+            autoComplete="new-password"
             required
           />
           <Input
@@ -168,12 +201,6 @@ export default function SignUp() {
           {error ? (
             <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400">
               {error}
-            </p>
-          ) : null}
-
-          {success ? (
-            <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-400">
-              {success}
             </p>
           ) : null}
 
