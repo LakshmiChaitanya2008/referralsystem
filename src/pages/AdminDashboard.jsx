@@ -5,6 +5,7 @@ import StandaloneMemberCard from "../components/StandaloneMemberCard";
 import AdminCreateMemberForm from "../components/admin/AdminCreateMemberForm";
 import AdminLinkMemberForm from "../components/admin/AdminLinkMemberForm";
 import supabase from "../lib/supabase";
+import { filterMemberProfiles, getAdminAuthUserId } from "../lib/memberProfile";
 import { buildReferralForest, getStandaloneProfiles } from "../lib/referralTree";
 
 function StatCard({ label, value, hint }) {
@@ -23,6 +24,7 @@ function Skeleton({ className }) {
 
 export default function AdminDashboard() {
   const [profiles, setProfiles] = useState([]);
+  const [adminAuthUserId, setAdminAuthUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -32,10 +34,15 @@ export default function AdminDashboard() {
     }
     setError("");
 
-    const { data, error: fetchError } = await supabase
-      .from("profiles")
-      .select("id, name, user_id, phone, referral_code, parent_id")
-      .order("name", { ascending: true });
+    const [{ data, error: fetchError }, { data: authData }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("id, name, user_id, phone, referral_code, parent_id")
+        .order("name", { ascending: true }),
+      supabase.auth.getUser(),
+    ]);
+
+    setAdminAuthUserId(getAdminAuthUserId(authData?.user));
 
     if (fetchError) {
       setError(fetchError.message || "Could not load members.");
@@ -55,13 +62,18 @@ export default function AdminDashboard() {
     loadProfiles();
   }, [loadProfiles]);
 
-  const forest = useMemo(() => buildReferralForest(profiles), [profiles]);
-  const standaloneMembers = useMemo(() => getStandaloneProfiles(profiles), [profiles]);
+  const members = useMemo(
+    () => filterMemberProfiles(profiles, { adminAuthUserId }),
+    [profiles, adminAuthUserId],
+  );
+
+  const forest = useMemo(() => buildReferralForest(members), [members]);
+  const standaloneMembers = useMemo(() => getStandaloneProfiles(members), [members]);
 
   const stats = useMemo(() => {
-    const total = profiles.length;
-    const referred = profiles.filter((p) => p.parent_id).length;
-    const inTrees = profiles.length - standaloneMembers.length;
+    const total = members.length;
+    const referred = members.filter((p) => p.parent_id).length;
+    const inTrees = members.length - standaloneMembers.length;
 
     return {
       total,
@@ -70,11 +82,11 @@ export default function AdminDashboard() {
       connectedTrees: forest.length,
       inTrees,
     };
-  }, [profiles, forest, standaloneMembers]);
+  }, [members, forest, standaloneMembers]);
 
   const profileById = useMemo(
-    () => new Map(profiles.map((profile) => [profile.id, profile])),
-    [profiles],
+    () => new Map(members.map((profile) => [profile.id, profile])),
+    [members],
   );
 
   if (loading) {
@@ -116,11 +128,11 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <AdminCreateMemberForm profiles={profiles} onSuccess={() => loadProfiles(true)} />
-        <AdminLinkMemberForm profiles={profiles} onSuccess={() => loadProfiles(true)} />
+        <AdminCreateMemberForm profiles={members} onSuccess={() => loadProfiles(true)} />
+        <AdminLinkMemberForm profiles={members} onSuccess={() => loadProfiles(true)} />
       </div>
 
-      <Card title="All Members" description={`${profiles.length} registered members.`}>
+      <Card title="All Members" description={`${members.length} registered members.`}>
         <div className="overflow-x-auto rounded-xl border border-slate-200/60 dark:border-white/10">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50/80 text-xs uppercase tracking-wide text-slate-500 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-400">
@@ -133,7 +145,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
-              {profiles.length === 0 ? (
+              {members.length === 0 ? (
                 <tr>
                   <td
                     colSpan={5}
@@ -143,7 +155,7 @@ export default function AdminDashboard() {
                   </td>
                 </tr>
               ) : (
-                profiles.map((profile) => {
+                members.map((profile) => {
                   const parent = profile.parent_id ? profileById.get(profile.parent_id) : null;
 
                   return (
