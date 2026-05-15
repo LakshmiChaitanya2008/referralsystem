@@ -40,14 +40,14 @@ export default function Navbar() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("name")
+        .select("name, user_id")
         .eq("id", user.id)
         .maybeSingle();
 
       const resolvedName =
         profile?.name ||
         user.user_metadata?.name ||
-        user.email?.split("@")[0] ||
+        profile?.user_id ||
         "User";
 
       setUserName(resolvedName);

@@ -4,21 +4,25 @@ import { useNavigate } from "react-router";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import UserIdField from "../components/UserIdField";
 import toast from "react-hot-toast";
 import supabase from "../lib/supabase";
+import {
+  USER_ID_PATTERN,
+  authEmailFromUserId,
+  buildUserId,
+} from "../lib/userIdAuth";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [userIdDigits, setUserIdDigits] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  function handleChange(event) {
-    const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  function handleUserIdDigitsChange(event) {
+    const digits = event.target.value.replace(/\D/g, "").slice(0, 9);
+    setUserIdDigits(digits);
   }
 
   async function handleLogin(event) {
@@ -26,14 +30,22 @@ export default function Login() {
     setError("");
     setLoading(true);
 
+    const userId = buildUserId(userIdDigits);
+
     try {
+      if (!USER_ID_PATTERN.test(userId)) {
+        throw new Error(
+          "User ID must start with MJ followed by exactly 9 digits (e.g. MJ123456789).",
+        );
+      }
+
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email.trim(),
-        password: formData.password,
+        email: authEmailFromUserId(userId),
+        password,
       });
 
       if (signInError) {
-        throw signInError;
+        throw new Error("Invalid user ID or password. Please try again.");
       }
 
       toast.success("Login successful!");
@@ -47,26 +59,22 @@ export default function Login() {
 
   return (
     <div className="mx-auto max-w-md">
-      <Card title="Welcome Back" description="Login to manage your referral campaigns.">
+      <Card title="Welcome Back" description="Login with your user ID and password.">
         <form className="space-y-4" onSubmit={handleLogin}>
-          <Input
-            id="login-email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            type="email"
-            label="Email"
-            placeholder="you@company.com"
-            required
+          <UserIdField
+            id="login-user-id-digits"
+            digits={userIdDigits}
+            onDigitsChange={handleUserIdDigitsChange}
           />
           <Input
             id="login-password"
             name="password"
-            value={formData.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
             type="password"
             label="Password"
             placeholder="••••••••"
+            autoComplete="current-password"
             required
           />
           {error ? (
@@ -80,7 +88,10 @@ export default function Login() {
         </form>
         <p className="mt-4 text-sm text-slate-600 dark:text-neutral-400">
           New here?{" "}
-          <Link to="/signup" className="font-semibold text-blue-700 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-400">
+          <Link
+            to="/signup"
+            className="font-semibold text-blue-700 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-400"
+          >
             Create an account
           </Link>
         </p>

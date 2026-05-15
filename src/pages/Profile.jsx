@@ -46,19 +46,6 @@ function buildReferralTree(currentUserId, users) {
   return buildNode(currentUserId);
 }
 
-function formatEmailDisplay(email) {
-  if (!email || !email.includes("@")) {
-    return email || "No email";
-  }
-
-  const [localPart, domainPart] = email.split("@");
-  if (localPart.length <= 12) {
-    return email;
-  }
-
-  return `${localPart.slice(0, 12)}...@${domainPart}`;
-}
-
 function ReferralTreeNode({ node }) {
   if (!node) {
     return null;
@@ -72,9 +59,9 @@ function ReferralTreeNode({ node }) {
       <div className="w-full max-w-xs rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md px-5 py-4 shadow-sm dark:shadow-none transition-transform duration-200 hover:scale-[1.03]">
         <div className="flex items-center justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white">{node.name || node.email || "User"}</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">{node.name || node.user_id || "User"}</p>
             <p className="max-w-[170px] truncate overflow-hidden whitespace-nowrap text-xs text-slate-500 dark:text-neutral-400">
-              {formatEmailDisplay(node.email)}
+              {node.user_id || "—"}
             </p>
           </div>
           <span className="rounded-full bg-blue-50 dark:bg-blue-900/50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
@@ -121,7 +108,7 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [profileData, setProfileData] = useState({
     name: "",
-    email: "",
+    user_id: "",
     phone: "",
     referral_code: "",
   });
@@ -195,7 +182,7 @@ export default function Profile() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("name, email, phone, referral_code")
+        .select("name, user_id, phone, referral_code")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -215,7 +202,7 @@ export default function Profile() {
 
       setProfileData({
         name: profile?.name || user.user_metadata?.name || "User",
-        email: profile?.email || user.email || "",
+        user_id: profile?.user_id || "",
         phone: profile?.phone || "",
         referral_code: profile?.referral_code || "",
       });
@@ -381,7 +368,9 @@ export default function Profile() {
               </div>
               <div className="space-y-1">
                 <p className="text-lg font-semibold text-slate-900 dark:text-white">{profileData.name || "User"}</p>
-                <p className="text-sm text-slate-500 dark:text-neutral-400">{profileData.email || "-"}</p>
+                <p className="text-sm text-slate-500 dark:text-neutral-400">
+                  User ID: {profileData.user_id || "-"}
+                </p>
                 <p className="text-sm text-slate-500 dark:text-neutral-400">{profileData.phone || "-"}</p>
               </div>
             </div>

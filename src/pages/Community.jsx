@@ -39,8 +39,8 @@ export default function Community() {
       if (!user) return;
       setCurrentUser(user);
       const { data: profile } = await supabase
-        .from("profiles").select("name").eq("id", user.id).maybeSingle();
-      setCurrentName(profile?.name || user.user_metadata?.name || user.email?.split("@")[0] || "User");
+        .from("profiles").select("name, user_id").eq("id", user.id).maybeSingle();
+      setCurrentName(profile?.name || user.user_metadata?.name || profile?.user_id || "User");
     }
     loadUser();
   }, []);
