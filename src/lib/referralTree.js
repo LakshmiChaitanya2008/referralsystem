@@ -1,3 +1,5 @@
+import { MAX_DIRECT_REFERRALS } from "./referralLimits";
+
 export function buildReferralTree(rootUserId, users) {
   if (!rootUserId || !users.length) {
     return null;
@@ -22,7 +24,7 @@ export function buildReferralTree(rootUserId, users) {
       .filter((candidate) => candidate.parent_id === userId)
       .map((child) => buildNode(child.id, nextVisited))
       .filter(Boolean)
-      .slice(0, 2);
+      .slice(0, MAX_DIRECT_REFERRALS);
 
     return {
       ...user,

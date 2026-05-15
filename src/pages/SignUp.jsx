@@ -12,6 +12,7 @@ import {
   authEmailFromUserId,
   buildUserId,
 } from "../lib/userIdAuth";
+import { isReferralLimitReached, referralLimitMessage } from "../lib/referralLimits";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -97,8 +98,8 @@ export default function SignUp() {
 
         if (countError) throw countError;
 
-        if (count >= 2) {
-          throw new Error("Referral limit reached.");
+        if (isReferralLimitReached(count)) {
+          throw new Error(referralLimitMessage());
         }
       }
 

@@ -5,101 +5,12 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import PhoneField, { isValidPhone } from "../components/PhoneField";
 import supabase from "../lib/supabase";
+import ReferralTreeNode from "../components/ReferralTreeNode";
+import { buildReferralTree } from "../lib/referralTree";
 
 function Skeleton({ className }) {
   return (
     <div className={`animate-pulse rounded-md bg-slate-200 dark:bg-neutral-800 ${className}`} />
-  );
-}
-
-function buildReferralTree(currentUserId, users) {
-  if (!currentUserId || !users.length) {
-    return null;
-  }
-
-  const userById = new Map(users.map((user) => [user.id, user]));
-
-  function buildNode(userId, visited = new Set()) {
-    if (visited.has(userId)) {
-      return null;
-    }
-
-    const user = userById.get(userId);
-    if (!user) {
-      return null;
-    }
-
-    const nextVisited = new Set(visited);
-    nextVisited.add(userId);
-
-    const children = users
-      .filter((candidate) => candidate.parent_id === userId)
-      .map((child) => buildNode(child.id, nextVisited))
-      .filter(Boolean)
-      .slice(0, 2);
-
-    return {
-      ...user,
-      children,
-    };
-  }
-
-  return buildNode(currentUserId);
-}
-
-function ReferralTreeNode({ node }) {
-  if (!node) {
-    return null;
-  }
-
-  const children = node.children || [];
-  const hasTwoChildren = children.length === 2;
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className="w-full max-w-xs rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md px-5 py-4 shadow-sm dark:shadow-none transition-transform duration-200 hover:scale-[1.03]">
-        <div className="flex items-center justify-between">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white">{node.name || node.user_id || "User"}</p>
-            <p className="max-w-[170px] truncate overflow-hidden whitespace-nowrap text-xs text-slate-500 dark:text-neutral-400">
-              {node.user_id || "—"}
-            </p>
-          </div>
-          <span className="rounded-full bg-blue-50 dark:bg-blue-900/50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
-            User
-          </span>
-        </div>
-      </div>
-
-      {children.length > 0 ? (
-        <div className="flex w-full flex-col items-center">
-          <div className={`w-px bg-slate-300 dark:bg-neutral-700 ${hasTwoChildren ? "h-6" : "h-10"}`} />
-
-          <div className="relative flex w-full min-w-max items-start justify-center">
-            {children.map((child, index) => {
-              const isLeftChild = index === 0;
-              const isRightChild = index === 1;
-
-              return (
-                <div key={index} className="relative flex min-h-4 flex-1 flex-col items-center px-2 sm:px-4">
-                  {hasTwoChildren && isLeftChild ? (
-                    <div className="absolute top-0 right-0 left-1/2 h-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-                  {hasTwoChildren && isRightChild ? (
-                    <div className="absolute top-0 left-0 right-1/2 h-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-
-                  {hasTwoChildren ? (
-                    <div className="h-4 w-px bg-slate-300 dark:bg-neutral-700" />
-                  ) : null}
-                  <ReferralTreeNode node={child} />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-    </div>
   );
 }
 
