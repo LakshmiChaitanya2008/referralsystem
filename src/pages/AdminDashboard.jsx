@@ -1,15 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Card from "../components/ui/Card";
-import ReferralTreeNode from "../components/ReferralTreeNode";
+import { ReferralTreePanel } from "../components/ReferralTreeView";
 import StandaloneMemberCard from "../components/StandaloneMemberCard";
 import AdminCreateMemberForm from "../components/admin/AdminCreateMemberForm";
 import AdminLinkMemberForm from "../components/admin/AdminLinkMemberForm";
 import supabase from "../lib/supabase";
-import {
-  buildReferralForest,
-  countDescendants,
-  getStandaloneProfiles,
-} from "../lib/referralTree";
+import { buildReferralForest, getStandaloneProfiles } from "../lib/referralTree";
 
 function StatCard({ label, value, hint }) {
   return (
@@ -205,17 +201,9 @@ export default function AdminDashboard() {
             No connected referral trees yet.
           </p>
         ) : (
-          <div className="space-y-10">
+          <div className="space-y-8">
             {forest.map((tree) => (
-              <div
-                key={tree.id}
-                className="overflow-auto rounded-xl border border-slate-200/60 bg-white/70 p-6 dark:border-white/10 dark:bg-white/5"
-              >
-                <p className="mb-4 text-sm font-medium text-slate-500 dark:text-neutral-400">
-                  Root: {tree.name || tree.user_id} · {countDescendants(tree) + 1} members in tree
-                </p>
-                <ReferralTreeNode node={tree} badgeLabel="Member" />
-              </div>
+              <ReferralTreePanel key={tree.id} tree={tree} badgeLabel="Member" />
             ))}
           </div>
         )}

@@ -5,7 +5,7 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import PhoneField, { isValidPhone } from "../components/PhoneField";
 import supabase from "../lib/supabase";
-import ReferralTreeNode from "../components/ReferralTreeNode";
+import { ReferralTreePanel } from "../components/ReferralTreeView";
 import { buildReferralTree } from "../lib/referralTree";
 
 function Skeleton({ className }) {
@@ -370,12 +370,8 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="mx-auto mt-6 max-w-4xl rounded-xl border border-slate-200/60 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md p-6 overflow-auto">
-          {referralTree ? (
-            <ReferralTreeNode node={referralTree} />
-          ) : (
-            <p className="text-sm text-slate-600 dark:text-neutral-400">No referral tree data available yet.</p>
-          )}
+        <div className="mt-6">
+          <ReferralTreePanel tree={referralTree} badgeLabel="Member" />
         </div>
       </Card>
 
